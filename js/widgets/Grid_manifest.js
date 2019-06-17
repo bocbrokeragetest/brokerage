@@ -4,7 +4,7 @@
     name: 'Grid Widget',
     description: '',
     createUIFn: function () {
-      var _new_brokerage_object_grid_widget= function (config = {}) {
+      var _new_brokerage_object_grid_widget = function (config = {}) {
         var _dom = {
           rootDiv: $('<div>')
         };
@@ -26,8 +26,7 @@
       return _new_brokerage_object_grid_widget();
     },
     createConfigurationUIFn: function () {
-      return new_brokerage_object_grid_config_js({
-      });
+      return new_brokerage_object_grid_config_js({});
     },
   });
 }(jQuery, OliveUI, OliveUI.modules.new_brokerage_object_grid_widget, OliveUI.modules.new_brokerage_object_grid_config_js));
