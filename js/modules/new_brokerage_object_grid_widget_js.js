@@ -1,7 +1,5 @@
   (function ($, OliveUI) {
     OliveUI.modules.new_brokerage_object_grid_widget_js = function (config = {}) {
-      config.height = config.minHeight || 100;
-      'use strict';
       var widgetFileNames = [];
       var indexedListNames = [];
       var indexListobjToUpdate = {};
@@ -21,40 +19,30 @@
       var grid = {
         type: "Grid",
         render: function (gridrendercontent) {
-if (typeof gridrendercontent.admin !=='undefined' && gridrendercontent.admin !== 'bad' && gridrendercontent.admin !== '' && typeof gridrendercontent.indexurl !=='undefined' && gridrendercontent.indexurl !== '')   // check if authorized !!!!!!!!
-{
-          var getAdminAjax = $.ajax({
-              url: gridrendercontent.indexurl.split('contents')[0] + "collaborators/" + gridrendercontent.user + "/permission",
-              beforeSend: function (xhr) {
-                xhr.setRequestHeader("Authorization", "Basic " + btoa(gridrendercontent.user + ":" + gridrendercontent.pass));
-              },
-              type: 'GET',
-            })
-            .done(function (response) {
-              gridrendercontent.admin = response.permission;
-            })
-            .fail(function (jqXHR) {
-
-               if (jqXHR.status == '403') {
-                gridrendercontent.admin = "user";
-              }
-
-              else if (jqXHR.getResponseHeader('X-RateLimit-Remaining') == 0) {
-                var resetmilis = jqXHR.getResponseHeader('X-RateLimit-Reset');
-                var resetdate = new Date(resetmilis * 1000);
-                alert("You have exceeded your limit of api calls, your limit will be refreshed: " + resetdate + "Login with your GitHub credentials if you do not want to wait");
-              }
-
-              else {
-                alert("unknown error occured");
-              }
-
-            });
-
-
+          if (typeof gridrendercontent.admin !== 'undefined' && gridrendercontent.admin !== 'bad' && typeof gridrendercontent.indexurl !== 'undefined' && gridrendercontent.indexurl !== ''  && typeof gridrendercontent.user !== 'undefined' && gridrendercontent.user !== '') // check if authorized !!!!!!!!
+          {
+            var getAdminAjax = $.ajax({
+                url: gridrendercontent.indexurl.split('contents')[0] + "collaborators/" + gridrendercontent.user + "/permission",
+                beforeSend: function (xhr) {
+                  xhr.setRequestHeader("Authorization", "Basic " + btoa(gridrendercontent.user + ":" + gridrendercontent.pass));
+                },
+                type: 'GET',
+              })
+              .done(function (response) {
+                gridrendercontent.admin = response.permission;
+              })
+              .fail(function (jqXHR) {
+                if (jqXHR.status == '403') {
+                  gridrendercontent.admin = "user";
+                } else if (jqXHR.getResponseHeader('X-RateLimit-Remaining') == 0) {
+                  var resetmilis = jqXHR.getResponseHeader('X-RateLimit-Reset');
+                  var resetdate = new Date(resetmilis * 1000);
+                  alert("You have exceeded your limit of api calls, your limit will be refreshed: " + resetdate + "Login with your GitHub credentials if you do not want to wait");
+                } else {
+                  alert("unknown error occured");
+                }
+              });
           }
-
-
           if (typeof gridrendercontent.indexurl !== 'undefined' && typeof gridrendercontent.indexfilename !== 'undefined' && gridrendercontent.indexurl !== '' && gridrendercontent.indexfilename !== '') {
             var getDataAjax = $.ajax({
                 url: gridrendercontent.indexurl + "/" + gridrendercontent.indexfilename,
@@ -113,16 +101,18 @@ if (typeof gridrendercontent.admin !=='undefined' && gridrendercontent.admin !==
                 instance = Object.assign({}, widgetlist[j]);
                 if (typeof instance !== 'undefined') {
                   var newinstance = instance.render(resultsJSON[i], gridrendercontent);
-                  $(newinstance).clone(true,true).appendTo(widgetcontainerinner);
+                  $(newinstance).clone(true, true).appendTo(widgetcontainerinner);
                 }
               }
             };
           }
+
+
           if ((typeof gridrendercontent.admin !== 'undefined') && (gridrendercontent.admin === "admin")) {
             var newbuttoninstance = Object.assign({}, widgetlist[j]);
             if (typeof newbuttoninstance.makeCreateButton === "function" && typeof gridrendercontent.admin !== 'undefined' && gridrendercontent.admin !== '' && widgetlist[j].type === gridrendercontent.type) {
               var newbutton = newbuttoninstance.makeCreateButton(gridrendercontent);
-              $(newbutton).clone(true,true).appendTo(widgetcontainerinner);
+              $(newbutton).clone(true, true).appendTo(widgetcontainerinner);
             }
           }
         }
@@ -168,6 +158,7 @@ if (typeof gridrendercontent.admin !=='undefined' && gridrendercontent.admin !==
         });
       }
       function cleanupIndexlist(gridrendercontent) {
+
         if ((typeof gridrendercontent.admin !== 'undefined') && (gridrendercontent.admin != "")) {
           getListOfObjects(gridrendercontent); // used fo r creation/update of indexlist - only for admin = authenticated users
         }
@@ -216,7 +207,6 @@ if (typeof gridrendercontent.admin !=='undefined' && gridrendercontent.admin !==
                 var resetdate = new Date(resetmilis * 1000);
                 alert("You have exceeded your limit of api calls, your limit will be refreshed: " + resetdate + "Login with your GitHub credentials if you do not want to wait");
               }
-
             });
         }
         function getDiffIndexList(gridinstance) {
@@ -262,7 +252,9 @@ if (typeof gridrendercontent.admin !=='undefined' && gridrendercontent.admin !==
               updatedat: unencodedcontentdiff.updatedat,
               datetype: unencodedcontentdiff.datetype,
               name: unencodedcontentdiff.name,
-              type: unencodedcontentdiff.type
+              type: unencodedcontentdiff.type,
+              picture: unencodedcontentdiff.picture
+
             });
           } else if (indexListobjToUpdate.ignoredlist.indexOf(response.name) == -1) {
             indexListobjToUpdate.ignoredlist.push(response.name);
@@ -298,6 +290,8 @@ if (typeof gridrendercontent.admin !=='undefined' && gridrendercontent.admin !==
               type: 'PUT',
               data: '{"message": "create indexlist","sha":"' + listsha + '","content":"' + btoa(JSON.stringify(updatedIndexList)) + '" }',
               dataType: 'json',
+            }).done(function () {
+              $('.glyphicon-refresh').trigger('click');
             });
           }
         }
